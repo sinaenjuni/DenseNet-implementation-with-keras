@@ -1,7 +1,7 @@
 
-
-
-
+from keras.layers import AveragePooling2D, Input, GlobalMaxPooling2D
+from keras import layers, models
+from keras import backend
 
 
 def dense_block(x, blocks, growth_rate, name):
@@ -49,15 +49,40 @@ def transition_block(x, reduction, name):
     return x
 
 
-def DenseNet(depth=100,
-             growthRate = 12,
-             include_top=True,
-             data_set='cifar10',
-             input_tensor=None,
-             input_shape=None,
-             pooling=None,
-             classes=1000,
+def DenseNet(depth=None,
+            custom_blocks = None,
+             growthRate = None,
+             include_top = None,
+             data_set = None,
+             input_tensor = None,
+             input_shape = None,
+             pooling = None,
+             classes = None,
              **kwargs):
+
+    assert depth is not None, "'depth' is None"
+    assert input_shape is not None, "'input_shape' is None"
+    assert data_set is not None, "'data_set' is 'cifar10' or 'imagenet' or 'kaggle' or 'caltech'"
+    assert classes is not None, "'classes' is None"
+    assert pooling is not None, "'pooling' is None"
+    assert include_top is not None, "'include_top' is None"
+
+
+    
+    if data_set is 'cifar10':
+        if growthRate is None:
+            growthRate = 12
+        if classes is None:
+            classes = 10
+
+    elif data_set is 'imagenet' or data_set is 'kaggle' or data_set is 'caltech':
+        if growthRate is None:
+            growthRate = 32
+        if classes is None:
+            classes = 1000
+        if depth is type(list):
+            custom_blocks = True
+
  
 
 
@@ -103,11 +128,11 @@ def DenseNet(depth=100,
 
 
         # Create model.
-        model = models.Model(img_input, x, name='densenet100')
+        model = models.Model(img_input, x, name=f'densenet{depth}')
         
     elif data_set is 'imagenet' or data_set is 'kaggle' or data_set is 'caltech':
         
-        if custom_blocks is None and depth is not None:
+        if custom_blocks is None:
 
             if depth == 121:
                 blocks = [6, 12, 24, 16]
@@ -120,7 +145,7 @@ def DenseNet(depth=100,
             else:
                 print(f'{depth} is not allowed depth, you will use custom_blocks parameter')
 
-        elif custom_blocks is not None and depth is None:
+        elif custom_blocks is not None:
 
             if len(custom_blocks) == 4:
                 blocks = custom_blocks
