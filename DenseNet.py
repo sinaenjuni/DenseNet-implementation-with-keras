@@ -80,8 +80,8 @@ def DenseNet(depth=None,
             growthRate = 32
         if classes is None:
             classes = 1000
-        if depth is type(list):
-            custom_blocks = True
+        if type(depth) is list:
+            custom_blocks = depth
 
  
 
@@ -94,12 +94,16 @@ def DenseNet(depth=None,
         else:
             img_input = input_tensor
         
-    bn_axis = 3
-    nChannels = 2 * growthRate
-    N = (depth - 4)//3
-    N = N//2
 
+    nChannels = 2 * growthRate
+    bn_axis = 3
+    
     if data_set is 'cifar10':
+        
+        N = (depth - 4)//3
+        N = N//2
+
+
         x = layers.ZeroPadding2D(padding=((1, 1), (1, 1)))(img_input)
         x = layers.Conv2D(nChannels, 3, strides=1, use_bias=False, name='conv1/conv')(x)
 
@@ -152,7 +156,7 @@ def DenseNet(depth=None,
                 depth = sum(blocks) * 2 + 5
 
             else:
-                print(f'custom_blocks is {len(custom_blocks)} length')
+                print(f'custom_blocks is {len(custom_blocks)} length, custom_blocks size is 4 length ')
 
         
     
